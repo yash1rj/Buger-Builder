@@ -1,4 +1,4 @@
-import classes from '*.module.css';
+import classes from './Button.module.css';
 import React from 'react';
 
 const button = (props) => (
