@@ -6,6 +6,9 @@ import Button from '../../../components/UI/Button/Button';
 import axios from '../../../axios-orders';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
+import WithErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+
+import * as actions from '../../../store/actions/index';
 
 import { connect } from 'react-redux';
 
@@ -78,7 +81,7 @@ class ContactData extends Component {
                     required: true,
                     isEmail: true
                 },
-                valid: false,
+                valid: true,
                 touched: false
             },
             deliveryMethod: {
@@ -89,13 +92,12 @@ class ContactData extends Component {
                         { value: 'cheapest', displayName: 'Cheapest' }
                     ]
                 },
-                value: '',
+                value: 'fastest',
                 validation: {},
                 valid: false
             }
         },
-        isFormValid: false,
-        loading: false
+        isFormValid: false
     }
 
     checkValidity = (value, rules) => {
@@ -134,7 +136,7 @@ class ContactData extends Component {
         event.preventDefault(); // we dont want to send data automatically and therby refresh the page
         // console.log(this.props.ingredients);
 
-        this.setState({ loading: true });
+        //this.setState({ loading: true });
 
         const formData = {};
         for (let formElementIdentifier in this.state.orderForm) {
@@ -147,20 +149,22 @@ class ContactData extends Component {
             orderData: formData
         };
 
-        axios.post('/orders.json', order)
-            .then(response => {
-                // console.log(response);
-                this.setState({
-                    loading: false
-                });
-                this.props.history.push('/');
-            })
-            .catch(err => {
-                // console.log(err);
-                this.setState({
-                    loading: false
-                });
-            });
+        this.props.onOrderBurger(order);
+
+        // axios.post('/orders.json', order)
+        //     .then(response => {
+        //         // console.log(response);
+        //         this.setState({
+        //             loading: false
+        //         });
+        //         this.props.history.push('/');
+        //     })
+        //     .catch(err => {
+        //         // console.log(err);
+        //         this.setState({
+        //             loading: false
+        //         });
+        //     });
     }
 
     inputChangedHandler = (event, inputIdentifier) => {
@@ -221,7 +225,7 @@ class ContactData extends Component {
             </form>
         );
 
-        if (this.state.loading) {
+        if (this.props.loading) {
             form = <Spinner />;
         }
         return (
@@ -235,9 +239,16 @@ class ContactData extends Component {
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        loading: state.orders.loading
     };
 };
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WithErrorHandler(ContactData, axios));
