@@ -81,7 +81,7 @@ class ContactData extends Component {
                     required: true,
                     isEmail: true
                 },
-                valid: true,
+                valid: false,
                 touched: false
             },
             deliveryMethod: {
@@ -94,7 +94,7 @@ class ContactData extends Component {
                 },
                 value: 'fastest',
                 validation: {},
-                valid: false
+                valid: true
             }
         },
         isFormValid: false
