@@ -11,7 +11,7 @@ import axios from '../../axios-orders';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 
-import { connect} from 'react-redux';
+import { connect } from 'react-redux';
 import * as actions from '../../store/actions/index';
 
 class BurgerBuilder extends Component {
@@ -21,15 +21,15 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount() {
-    //     axios.get('https://my-burgerbuilder-1d688-default-rtdb.firebaseio.com/ingredients.json')
-    //         .then(response => {
-    //             this.setState({
-    //                 ingredients: response.data
-    //             });
-    //         })
-    //         .catch(err => {
-    //             this.setState({error: true});
-    //         });
+        //     axios.get('https://my-burgerbuilder-1d688-default-rtdb.firebaseio.com/ingredients.json')
+        //         .then(response => {
+        //             this.setState({
+        //                 ingredients: response.data
+        //             });
+        //         })
+        //         .catch(err => {
+        //             this.setState({error: true});
+        //         });
 
         this.props.onInitIngredients();
     }
@@ -53,7 +53,7 @@ class BurgerBuilder extends Component {
         //     pathname: '/checkout',
         //     search: '?' + queryString
         // });
-    
+
     }
 
     purchaseCancelHandler = () => {
@@ -61,7 +61,12 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () => {
-        this.setState({ purchasing: true });
+        if (!this.props.isAuthenticated) {
+            this.props.history.push('/auth');
+        }
+        else {
+            this.setState({ purchasing: true });
+        }
     }
 
     updatePurchaseState(ingredients) {
@@ -134,6 +139,7 @@ class BurgerBuilder extends Component {
                         disabled={disabledInfo}
                         purchasable={this.updatePurchaseState(this.props.ings)}
                         ordered={this.purchaseHandler}
+                        isAuth={this.props.isAuthenticated}
                         price={this.props.price} />
                 </Aux>
             );
@@ -166,7 +172,8 @@ const mapStateToProps = state => {
     return {
         ings: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.totalPrice,
-        error: state.burgerBuilder.error
+        error: state.burgerBuilder.error,
+        isAuthenticated: state.auth.tokenId
     };
 };
 
