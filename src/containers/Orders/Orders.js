@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 
 import Order from '../../components/Order/Order';
 import axios from '../../axios-orders';
@@ -7,48 +7,27 @@ import { connect } from 'react-redux';
 import * as actions from '../../store/actions/index';
 import Spinner from '../../components/UI/Spinner/Spinner';
 
-class Orders extends Component {
+const Orders = props => {
 
-    componentDidMount() {
-        // axios.get('/orders.json')
-        //     .then(res => {
-        //         // console.log(res.data);
-        //         const fetchedOrders = [];
-        //         for (let key in res.data) {
-        //             fetchedOrders.push({
-        //                 ...res.data[key],
-        //                 id: key
-        //             });
-        //         }
-        //         this.setState({
-        //             loading: false,
-        //             orders: fetchedOrders
-        //         });
-        //     })
-        //     .catch(err => {
-        //         this.setState({
-        //             loading: false
-        //         });
-        //     })
-        this.props.onFetchOrders(this.props.token, this.props.userId);
+    useEffect(() => {
+        props.onFetchOrders(props.token, props.userId);
+    }, []);
+
+    let allOrders = <Spinner />;
+    if (!props.loading) {
+        allOrders = (
+            <div>
+                {props.orders.map(order => (
+                    <Order
+                        key={order.id}
+                        ingredients={order.ingredients}
+                        price={order.price} />
+                ))}
+            </div>
+        );
     }
 
-    render() {
-        let allOrders = <Spinner />;
-        if(!this.props.loading) {
-            allOrders = (
-                <div>
-                    {this.props.orders.map(order => (
-                        <Order
-                            key={order.id}
-                            ingredients={order.ingredients}
-                            price={order.price} />
-                    ))}
-                </div>
-            );
-        }
-        return allOrders;
-    }
+    return allOrders;
 }
 
 const mapStateToProps = state => {
