@@ -1,23 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Order from '../../components/Order/Order';
 import axios from '../../axios-orders';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
-import { connect } from 'react-redux';
 import * as actions from '../../store/actions/index';
 import Spinner from '../../components/UI/Spinner/Spinner';
 
 const Orders = props => {
 
+    const dispatch = useDispatch();
+
+    const orders = useSelector(state => state.orders.orders);
+    const loading = useSelector(state => state.orders.loading);
+    const token = useSelector(state => state.auth.tokenId);
+    const userId = useSelector(state => state.auth.userId);
+
+    const onFetchOrders = useCallback(
+        (token, userId) => dispatch(actions.fetchOrders(token, userId)),
+        [dispatch]
+    );
+
+
     useEffect(() => {
-        props.onFetchOrders(props.token, props.userId);
-    }, []);
+        onFetchOrders(token, userId);
+    }, [onFetchOrders]);
 
     let allOrders = <Spinner />;
-    if (!props.loading) {
+    if (!loading) {
         allOrders = (
             <div>
-                {props.orders.map(order => (
+                {orders.map(order => (
                     <Order
                         key={order.id}
                         ingredients={order.ingredients}
@@ -30,19 +43,4 @@ const Orders = props => {
     return allOrders;
 }
 
-const mapStateToProps = state => {
-    return {
-        orders: state.orders.orders,
-        loading: state.orders.loading,
-        token: state.auth.tokenId,
-        userId: state.auth.userId
-    }
-};
-
-const mapDispatchToProps = dispatch => {
-    return {
-        onFetchOrders: (token, userId) => dispatch(actions.fetchOrders(token, userId))
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(Orders, axios));
+export default withErrorHandler(Orders, axios);
