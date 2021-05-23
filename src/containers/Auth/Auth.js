@@ -44,11 +44,13 @@ const Auth = props => {
 
     const [isSignUp, setIsSignUp] = useState(true);
 
+    const { buildingBurger, authRedirectPath, onAuthSetRedirectPath} = props;
+
     useEffect(() => {
-        if (!props.buildingBurger && props.authRedirectPath !== '/') {
-            props.onAuthSetRedirectPath();
+        if (!buildingBurger && authRedirectPath !== '/') {
+            onAuthSetRedirectPath();
         }
-    }, []);
+    }, [buildingBurger, authRedirectPath, onAuthSetRedirectPath]);
 
     const inputChangedHandler = (event, controlName) => {
         // console.log(event.target.value);
